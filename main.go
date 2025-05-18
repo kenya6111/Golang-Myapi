@@ -96,7 +96,7 @@ func main() {
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
 	r.HandleFunc("/article", handlers.PostingArticleHandler).Methods(http.MethodPost)
 	r.HandleFunc("/article/list", handlers.GetArticleListHandler).Methods(http.MethodGet)
-	r.HandleFunc("/article/1", handlers.GetArticleHandler).Methods(http.MethodGet)
+	r.HandleFunc("/article/{id:[0-9]+}", handlers.GetArticleHandler).Methods(http.MethodGet)
 	r.HandleFunc("/article/nice", handlers.PostingNiceHandler).Methods(http.MethodPost)
 	r.HandleFunc("/comment", handlers.CommentHandler).Methods(http.MethodPost)
 

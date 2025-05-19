@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/handlers"
@@ -50,6 +52,23 @@ func (u *MyCar) stop() {
 	u.speed = 0
 }
 
+type Comment struct {
+	CommentID int       `json:"comment_id"`
+	ArticleID int       `json:"article_id"`
+	Message   string    `json:"message"`
+	createdAt time.Time `json:"created_at"`
+}
+
+type Article struct {
+	ID          int       `json:"article_id"`
+	Title       string    `json:"title"`
+	Contents    string    `json:"contents"`
+	UserName    string    `json:"user_name"`
+	NiceNum     int       `json:"nice"`
+	CommentList []Comment `json:"comments"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 func main() {
 	// t := Test{name: "John", age: 22}
 	// fmt.Println(t)
@@ -89,6 +108,35 @@ func main() {
 	// http.HandleFunc("/article/nice", handlers.PostingNiceHandler)
 	// http.HandleFunc("/comment", handlers.CommentHandler)
 	// log.Println("Starting server on :8080")
+	comment1 := Comment{
+		CommentID: 1,
+		ArticleID: 1,
+		Message:   "test comment1",
+		createdAt: time.Now(),
+	}
+	comment2 := Comment{
+		CommentID: 2,
+		ArticleID: 1,
+		Message:   "test comment2",
+		createdAt: time.Now(),
+	}
+	article := Article{
+		ID:          1,
+		Title:       "first article",
+		Contents:    "this is the test article",
+		UserName:    "kenya",
+		NiceNum:     1,
+		CommentList: []Comment{comment1, comment2},
+		CreatedAt:   time.Now(),
+	}
+
+	// fmt.Printf("%+v\n", article)
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%s\n", jsonData)
 
 	r := mux.NewRouter()
 	// Routes consist of a path and a handler function.

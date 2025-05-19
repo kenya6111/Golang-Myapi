@@ -69,3 +69,6 @@ if err != nil {
 http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 return
 }
+
+[p.82]Go 構造体のような何らかのデータ型を json に変換することを「json にエンコードす
+る」と呼びます

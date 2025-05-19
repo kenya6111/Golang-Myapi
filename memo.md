@@ -53,3 +53,19 @@ curl コマンドに-w '%{http_code}\n' というオプションをつけたこ�
 http.ListenAndServe 関数の第二引数というのは、実は「サーバーの中で使うルータを指定する」
 部分なのです。ここにルータが渡されず nil だった場合には、Go の HTTP サーバーがデフォル
 トで持っているルータが自動的に採用されます。
+
+
+func Atoi(s string) (int, error)
+Atoi 関数の第二戻り値 error は、int 型に直せないような値が引数として与えられたときにエ
+ラーを返すためのものです。int 型に直せないような値がもしここに入るということは、リクエス
+23https://pkg.go.dev/github.com/gorilla/mux#Vars
+24https://pkg.go.dev/strconv#Atoi
+65
+トのパスパラメータの値がおかしいということです。そのため、その場合には「リクエストが不
+正だ」という意味の 400 番エラーを返すことにします。25
+articleID, err := strconv.Atoi(mux.Vars(req)["id"])
+if err != nil {
+// 400 番エラー (BadRequest) を返す
+http.Error(w, "Invalid query parameter", http.StatusBadRequest)
+return
+}

@@ -1,33 +1,34 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/yourname/reponame/models"
 )
 
 func HelloHandler(w http.ResponseWriter, req *http.Request) {
-	// u, _ := url.Parse("http://localhost:8080?page=1&page=2&a=1&")
-	// queryMap := u.Query()
-	// fmt.Println(queryMap["page"])
-	// fmt.Println(queryMap["a"])
-	// fmt.Println(queryMap["b"])
 	io.WriteString(w, "Hello, World!!")
 
 }
 
 func PostingArticleHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "postingArticle!!!")
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json\n", http.StatusInternalServerError)
+	}
+	w.Write(jsonData)
 }
 
 func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	queryMap := req.URL.Query()
 
 	var page int
-
 	if p, ok := queryMap["page"]; ok && len(p) > 0 {
 		var err error
 		page, err = strconv.Atoi(p[0])
@@ -39,9 +40,14 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 		page = 1
 	}
 
-	resString := fmt.Sprintf("Article List (page %d)\n", page)
-	io.WriteString(w, resString)
-	// io.WriteString(w, "getArticles!!!")
+	articleList := []models.Article{models.Article1, models.Article2}
+	jsonData, err := json.Marshal(articleList)
+	if err != nil {
+		_, errMsg := fmt.Printf("failed to encode json (page %d)\n", page)
+		http.Error(w, errMsg.Error(), http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
 }
 
 func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
@@ -50,14 +56,33 @@ func GetArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 		return
 	}
-	resString := fmt.Sprintf("Article No.%d\n", articleID)
-	io.WriteString(w, resString)
+
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		_, errMsg := fmt.Printf("failed to encode json (page %d)\n", articleID)
+		http.Error(w, errMsg.Error(), http.StatusInternalServerError)
+	}
+
+	w.Write(jsonData)
 }
 
 func PostingNiceHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "postingNice!!!")
+	article := models.Article1
+	jsonData, err := json.Marshal(article)
+	if err != nil {
+		http.Error(w, "failed to encode json\n", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
 }
 
 func CommentHandler(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "comment!!!")
+	comment := models.Comment1
+	jsonData, err := json.Marshal(comment)
+	if err != nil {
+		http.Error(w, "fail to encode json\n", http.StatusInternalServerError)
+		return
+	}
+	w.Write(jsonData)
 }

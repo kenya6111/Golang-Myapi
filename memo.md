@@ -1,3 +1,30 @@
+## [p.22]構造体の理解
+Go には、複数の型を一つにまとめた構造体型というものが存在し、予約語 struct を用いて定義
+することができます。
+```txt
+type Person struct{
+height int
+weight int
+name string
+}
+```
+また、構造体にはメソッドという特殊な関数を紐づけることができます。
+```txt
+func (p *Person) Greeting() {
+fmt.Printf("Hello, my name is %s\n", p.name)
+}
+```
+
+このように Greeting メソッドを定義したので、Person 型の変数の後に.Greeting() と記述する
+ことでメソッドを呼び出せます。
+```txt
+p := Person{name: "hsaki"}
+p.Greeting()
+// Hello, my name is hsaki
+```
+このとき、メソッドに対する変数 p のことをレシーバーと呼びます。
+
+
 Go では main 以外のパッケージ名は、基本的にそのファイルが格納されているディレクトリ名と
 同名にする必要があります
 
@@ -72,3 +99,13 @@ return
 
 [p.82]Go 構造体のような何らかのデータ型を json に変換することを「json にエンコードす
 る」と呼びます
+
+
+//HTTPメソッドの指定（-X）
+$ curl -X PUT http://www.example.com/
+
+
+ストリームから直接リクエストデータを取るようにしたことで、デコード前の「Content-Length
+ヘッダフィールドの値からバイトスライスを作り、そこにリクエストボディの中身を書き込む」と
+いう操作がまるまるいらなくなっています。直接デコーダの Decode メソッドを呼び出すだけで済
+むため、コードの見通しがとても良くなりました

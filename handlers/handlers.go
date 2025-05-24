@@ -12,25 +12,44 @@ import (
 	"github.com/yourname/reponame/models"
 )
 
-func HelloHandler(w http.ResponseWriter, req *http.Request) {
+type Test struct {
+	name string
+	age  int
+}
+
+func HelloHandler(w http.ResponseWriter, req *http.Request) { //curl http://localhost:8080/hello
 	io.WriteString(w, "Hello, World!!")
 
 }
 
 func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Println(req.Header)
+	fmt.Println(req.Header.Get("Content-Length"))
+	fmt.Println(req.Header.Get("Content-Type"))
+	fmt.Println(req.Header.Get("User-Agent"))
 	length, err := strconv.Atoi(req.Header.Get("Content-Length"))
 	if err != nil {
 		http.Error(w, "cannot get content length \n", http.StatusBadRequest)
+		return
 	}
+	fmt.Println(length)
 	reqBodyBuffer := make([]byte, length)
+	fmt.Println(reqBodyBuffer)
 
 	if _, err := req.Body.Read(reqBodyBuffer); !errors.Is(err, io.EOF) {
 		http.Error(w, "failed to read request body\n", http.StatusInternalServerError)
+		return
 	}
 
 	defer req.Body.Close()
 
-	article := models.Article1
+	var reqArticle models.Article
+	if err := json.Unmarshal(reqBodyBuffer, &reqArticle); err != nil {
+		http.Error(w, "failed to decode json\n", http.StatusInternalServerError)
+		return
+	}
+
+	article := reqArticle
 	jsonData, err := json.Marshal(article)
 	if err != nil {
 		http.Error(w, "failed to encode json\n", http.StatusInternalServerError)

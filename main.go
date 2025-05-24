@@ -142,7 +142,7 @@ func main() {
 	// Routes consist of a path and a handler function.
 	r.HandleFunc("/", handlers.HelloHandler).Methods(http.MethodGet)
 	r.HandleFunc("/hello", handlers.HelloHandler).Methods(http.MethodGet)
-	r.HandleFunc("/article", handlers.PostingArticleHandler).Methods(http.MethodPost)
+	r.HandleFunc("/article", handlers.PostArticleHandler).Methods(http.MethodPost)
 	r.HandleFunc("/article/list", handlers.GetArticleListHandler).Methods(http.MethodGet)
 	r.HandleFunc("/article/{id:[0-9]+}", handlers.GetArticleHandler).Methods(http.MethodGet)
 	r.HandleFunc("/article/nice", handlers.PostingNiceHandler).Methods(http.MethodPost)

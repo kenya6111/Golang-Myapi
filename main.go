@@ -1,13 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/handlers"
+	"github.com/yourname/reponame/models"
 )
 
 type Comment struct {
@@ -28,6 +31,45 @@ type Article struct {
 }
 
 func main() {
+	dbUser := "docker"
+	dbPassword := "docker"
+	dbDatabase := "sampledb"
+	dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
+	db, err := sql.Open("mysql", dbConn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+	const sqlStr = `
+		select * from articles;
+	`
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	articleArray := make([]models.Article, 0)
+	for rows.Next() {
+		var article models.Article
+		var createdTime sql.NullTime
+
+		err := rows.Scan(&article.ID, &article.Title, &article.Contents,
+			&article.UserName, &article.NiceNum, &createdTime)
+		if createdTime.Valid {
+			article.CreatedAt = createdTime.Time
+		}
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			articleArray = append(articleArray, article)
+		}
+	}
+	fmt.Println("----------")
+	fmt.Printf("%+v\n", articleArray)
+	fmt.Println("----------")
 
 	comment1 := Comment{
 		CommentID: 1,
@@ -62,6 +104,6 @@ func main() {
 	r.HandleFunc("/article/nice", handlers.PostingNiceHandler).Methods(http.MethodPost)
 	r.HandleFunc("/comment", handlers.CommentHandler).Methods(http.MethodPost)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8081", r))
 
 }

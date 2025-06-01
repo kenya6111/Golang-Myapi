@@ -10,7 +10,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/handlers"
-	"github.com/yourname/reponame/models"
 )
 
 type Comment struct {
@@ -41,6 +40,39 @@ func main() {
 	}
 	defer db.Close()
 	// articleID := 1
+	tx, err := db.Begin()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	article_id := 1
+	const sqlGetNice = `
+	select nice from articles where article_id=?;`
+	row := tx.QueryRow(sqlGetNice, article_id)
+
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	var niceNum int
+	err = row.Scan(&niceNum)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+
+	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
+	_, err = tx.Exec(sqlUpdateNice, niceNum+1, article_id)
+	if err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 
 	// const sqlStr = `
 	// 	select * from articles
@@ -59,24 +91,23 @@ func main() {
 	// 	fmt.Println(err)
 	// 	return
 	// }
-	article := models.Article{
-		Title:    "first article",
-		Contents: "this is the test article",
-		UserName: "kenya",
-		NiceNum:  0,
-	}
+	// article := models.Article{
+	// 	Title:    "first article",
+	// 	Contents: "this is the test article",
+	// 	UserName: "kenya",
+	// 	NiceNum:  0,
+	// }
 
-	const sqlStr = `
-	insert into articles (title,contents,username, nice,created_at) values (?,?,?,?,now())`
+	// const sqlStr = `
+	// insert into articles (title,contents,username, nice,created_at) values (?,?,?,?,now())`
 
-	result, err := db.Exec(sqlStr, article.Title, article.Contents, article.UserName, article.NiceNum)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// result, err := db.Exec(sqlStr, article.Title, article.Contents, article.UserName, article.NiceNum)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
 
-	fmt.Println(result.LastInsertId())
-	fmt.Println(result.RowsAffected())
+	// fmt.Println(result.LastInsertId())
+	// fmt.Println(result.RowsAffected())
 	// fmt.Println("inserted article:", article)
 	// articleArray := make([]models.Article, 0)
 	// var article models.Article

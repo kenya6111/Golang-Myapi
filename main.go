@@ -40,13 +40,13 @@ func main() {
 		fmt.Println(err)
 	}
 	defer db.Close()
-	articleID := 1
+	// articleID := 1
 
-	const sqlStr = `
-		select * from articles
-		where article_id = ?;
-		;
-	`
+	// const sqlStr = `
+	// 	select * from articles
+	// 	where article_id = ?;
+	// 	;
+	// `
 	// rows, err := db.Query(sqlStr, articleID)
 	// if err != nil {
 	// 	fmt.Println(err)
@@ -54,16 +54,34 @@ func main() {
 	// }
 	// defer rows.Close()
 
-	row := db.QueryRow(sqlStr, articleID)
-	if err := row.Err(); err != nil {
+	// row := db.QueryRow(sqlStr, articleID)
+	// if err := row.Err(); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	article := models.Article{
+		Title:    "first article",
+		Contents: "this is the test article",
+		UserName: "kenya",
+		NiceNum:  0,
+	}
+
+	const sqlStr = `
+	insert into articles (title,contents,username, nice,created_at) values (?,?,?,?,now())`
+
+	result, err := db.Exec(sqlStr, article.Title, article.Contents, article.UserName, article.NiceNum)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	fmt.Println(result.LastInsertId())
+	fmt.Println(result.RowsAffected())
+	// fmt.Println("inserted article:", article)
 	// articleArray := make([]models.Article, 0)
-	var article models.Article
-	var createdTime sql.NullTime
-	// for rows.Next() {
+	// var article models.Article
+	// var createdTime sql.NullTime
+	// // for rows.Next() {
 	// 	var article models.Article
 	// 	var createdTime sql.NullTime
 
@@ -79,19 +97,19 @@ func main() {
 	// 		articleArray = append(articleArray, article)
 	// 	}
 	// }
-	err = row.Scan(&article.ID, &article.Title, &article.Contents, &article.UserName,
-		&article.NiceNum, &createdTime)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// err = row.Scan(&article.ID, &article.Title, &article.Contents, &article.UserName,
+	// 	&article.NiceNum, &createdTime)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	if createdTime.Valid {
-		article.CreatedAt = createdTime.Time
-	}
-	fmt.Println("----------")
-	fmt.Printf("%+v\n", article)
-	fmt.Println("----------")
+	// if createdTime.Valid {
+	// 	article.CreatedAt = createdTime.Time
+	// }
+	// fmt.Println("----------")
+	// fmt.Printf("%+v\n", article)
+	// fmt.Println("----------")
 
 	// comment1 := Comment{
 	// 	CommentID: 1,
@@ -114,7 +132,7 @@ func main() {
 	// 	CommentList: []Comment{comment1, comment2},
 	// 	CreatedAt:   time.Now(),
 	// }
-	fmt.Printf("%+v\n", article)
+	// fmt.Printf("%+v\n", article)
 
 	r := mux.NewRouter()
 	// Routes consist of a path and a handler function.

@@ -34,64 +34,86 @@ func main() {
 	dbUser := "docker"
 	dbPassword := "docker"
 	dbDatabase := "sampledb"
-	dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
+	dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3308)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
 	db, err := sql.Open("mysql", dbConn)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer db.Close()
+	articleID := 1
+
 	const sqlStr = `
-		select * from articles;
+		select * from articles
+		where article_id = ?;
+		;
 	`
-	rows, err := db.Query(sqlStr)
+	// rows, err := db.Query(sqlStr, articleID)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// defer rows.Close()
+
+	row := db.QueryRow(sqlStr, articleID)
+	if err := row.Err(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// articleArray := make([]models.Article, 0)
+	var article models.Article
+	var createdTime sql.NullTime
+	// for rows.Next() {
+	// 	var article models.Article
+	// 	var createdTime sql.NullTime
+
+	// 	err := rows.Scan(&article.ID, &article.Title, &article.Contents,
+	// 		&article.UserName, &article.NiceNum, &createdTime)
+	// 	if createdTime.Valid {
+	// 		article.CreatedAt = createdTime.Time
+	// 	}
+
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	} else {
+	// 		articleArray = append(articleArray, article)
+	// 	}
+	// }
+	err = row.Scan(&article.ID, &article.Title, &article.Contents, &article.UserName,
+		&article.NiceNum, &createdTime)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer rows.Close()
 
-	articleArray := make([]models.Article, 0)
-	for rows.Next() {
-		var article models.Article
-		var createdTime sql.NullTime
-
-		err := rows.Scan(&article.ID, &article.Title, &article.Contents,
-			&article.UserName, &article.NiceNum, &createdTime)
-		if createdTime.Valid {
-			article.CreatedAt = createdTime.Time
-		}
-
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			articleArray = append(articleArray, article)
-		}
+	if createdTime.Valid {
+		article.CreatedAt = createdTime.Time
 	}
 	fmt.Println("----------")
-	fmt.Printf("%+v\n", articleArray)
+	fmt.Printf("%+v\n", article)
 	fmt.Println("----------")
 
-	comment1 := Comment{
-		CommentID: 1,
-		ArticleID: 1,
-		Message:   "test comment1",
-		CreatedAt: time.Now(),
-	}
-	comment2 := Comment{
-		CommentID: 2,
-		ArticleID: 1,
-		Message:   "test comment2",
-		CreatedAt: time.Now(),
-	}
-	article := Article{
-		ID:          1,
-		Title:       "first article",
-		Contents:    "this is the test article",
-		UserName:    "kenya",
-		NiceNum:     1,
-		CommentList: []Comment{comment1, comment2},
-		CreatedAt:   time.Now(),
-	}
+	// comment1 := Comment{
+	// 	CommentID: 1,
+	// 	ArticleID: 1,
+	// 	Message:   "test comment1",
+	// 	CreatedAt: time.Now(),
+	// }
+	// comment2 := Comment{
+	// 	CommentID: 2,
+	// 	ArticleID: 1,
+	// 	Message:   "test comment2",
+	// 	CreatedAt: time.Now(),
+	// }
+	// article = Article{
+	// 	ID:          1,
+	// 	Title:       "first article",
+	// 	Contents:    "this is the test article",
+	// 	UserName:    "kenya",
+	// 	NiceNum:     1,
+	// 	CommentList: []Comment{comment1, comment2},
+	// 	CreatedAt:   time.Now(),
+	// }
 	fmt.Printf("%+v\n", article)
 
 	r := mux.NewRouter()

@@ -6,52 +6,22 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/yourname/reponame/models"
 	"github.com/yourname/reponame/repositories"
+	"github.com/yourname/reponame/repositories/testdata"
 	// (以下略)
 )
 
 // SelectArticleDetail 関数のテスト
 func TestSelectArticleDetail(t *testing.T) {
-	// dbUser := "docker"
-	// dbPassword := "docker"
-	// dbDatabase := "sampledb"
-	// dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3308)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
-	// db, err := sql.Open("mysql", dbConn)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// defer db.Close()
-
-	// 1. テスト結果として期待する値を定義
-	// expected := models.Article{
-	// 	ID:       1,
-	// 	Title:    "firstPost",
-	// 	Contents: "This is my first blog",
-	// 	UserName: "saki",
-	// 	NiceNum:  32,
-	// }
-
 	tests := []struct {
 		testTitle string
 		expected  models.Article
 	}{
 		{
 			testTitle: "subtest1", // テストのタイトル
-			expected: models.Article{ // テストで期待する値
-				ID:       1,
-				Title:    "firstPost",
-				Contents: "This is my first blog",
-				UserName: "saki",
-				NiceNum:  32,
-			},
+			expected:  testdata.ArticleTestData[0],
 		}, {
 			testTitle: "subtest2",
-			expected: models.Article{
-				ID:       2,
-				Title:    "2nd",
-				Contents: "Second blog post",
-				UserName: "saki",
-				NiceNum:  4,
-			},
+			expected:  testdata.ArticleTestData[1],
 		},
 	}
 	for _, test := range tests {
@@ -92,18 +62,8 @@ func TestSelectArticleDetail(t *testing.T) {
 
 // SelectArticleList 関数のテスト
 func TestSelectArticleList(t *testing.T) {
-	// テストで使うデータベースに接続
-	// dbUser := "docker"
-	// dbPassword := "docker"
-	// dbDatabase := "sampledb"
-	// dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
-	// db, err := sql.Open("mysql", dbConn)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
-	// defer db.Close()
 	// テスト対象の関数を実行
-	expectedNum := 5
+	expectedNum := len(testdata.ArticleTestData)
 	got, err := repositories.SelectArticleList(testDB, 1)
 	if err != nil {
 		t.Fatal(err)
@@ -120,7 +80,7 @@ func TestInsertArticle(t *testing.T) {
 		Contents: "testest",
 		UserName: "saki",
 	}
-	expectedArticleNum := 8
+	expectedArticleNum := 50
 	newArticle, err := repositories.InsertArticle(testDB, article)
 	if err != nil {
 		t.Error(err)
@@ -135,4 +95,25 @@ func TestInsertArticle(t *testing.T) {
 			`
 		testDB.Exec(sqlStr, article.Title, article.Contents, article.UserName)
 	})
+}
+
+func TestUpdateNiceNum(t *testing.T) {
+	articleID := 1
+	before, err := repositories.SelectArticleDetail(testDB, articleID)
+	if err != nil {
+		t.Fatal("failed to get before data")
+	}
+	err = repositories.UpdateNiceNum(testDB, articleID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	after, err := repositories.SelectArticleDetail(testDB, articleID)
+	if err != nil {
+		t.Fatal("fail to get after data")
+	}
+
+	if after.NiceNum-before.NiceNum != 1 {
+		t.Error("fail to update nice num")
+	}
 }

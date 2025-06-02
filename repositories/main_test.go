@@ -16,7 +16,7 @@ var (
 	dbUser     = "docker"
 	dbPassword = "docker"
 	dbDatabase = "sampledb"
-	dbConn     = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/%s?parseTime=true", dbUser,
+	dbConn     = fmt.Sprintf("%s:%s@tcp(127.0.0.1:3308)/%s?parseTime=true", dbUser,
 		dbPassword, dbDatabase)
 )
 
@@ -40,10 +40,13 @@ func setupTestData() error {
 }
 
 func cleanupDB() error {
-	cmd := exec.Command("mysql", "-h", "127.0.0.1", "-u", "docker", "sampledb",
+	cmd := exec.Command("mysql", "--protocol=tcp", "-h", "127.0.0.1", "-u", "docker", "sampledb",
 		"--password=docker", "-e", "source ./testdata/cleanupDB.sql")
-	err := cmd.Run()
+	// err := cmd.Run()
+	out, err := cmd.CombinedOutput()
+
 	if err != nil {
+		fmt.Printf("cleanupDB failed: %s\n", string(out))
 		return err
 	}
 	return nil

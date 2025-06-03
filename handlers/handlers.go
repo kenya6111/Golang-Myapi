@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/yourname/reponame/models"
-	service "github.com/yourname/reponame/serivces"
+	"github.com/yourname/reponame/services"
 )
 
 type Test struct {
@@ -27,7 +27,7 @@ func PostArticleHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
 
-	article, err := service.PostArticleService(reqArticle)
+	article, err := services.PostArticleService(reqArticle)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
@@ -51,7 +51,7 @@ func GetArticleListHandler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		page = 1
 	}
-	articleList, err := service.GetArticleListService(page)
+	articleList, err := services.GetArticleListService(page)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
@@ -66,7 +66,7 @@ func ArticleDetailHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Invalid query parameter", http.StatusBadRequest)
 		return
 	}
-	article, err := service.GetArticleService(articleID)
+	article, err := services.GetArticleService(articleID)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
@@ -81,7 +81,7 @@ func PostingNiceHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
 
-	article, err := service.PostNiceService(reqArticle)
+	article, err := services.PostNiceService(reqArticle)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
@@ -96,7 +96,7 @@ func CommentHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
 
-	comment, err := service.PostCommentService(reqComment)
+	comment, err := services.PostCommentService(reqComment)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return

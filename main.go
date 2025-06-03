@@ -1,8 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -30,49 +28,49 @@ type Article struct {
 }
 
 func main() {
-	dbUser := "docker"
-	dbPassword := "docker"
-	dbDatabase := "sampledb"
-	dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3308)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
-	db, err := sql.Open("mysql", dbConn)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer db.Close()
-	// articleID := 1
-	tx, err := db.Begin()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// dbUser := "docker"
+	// dbPassword := "docker"
+	// dbDatabase := "sampledb"
+	// dbConn := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3308)/%s?parseTime=true", dbUser, dbPassword, dbDatabase)
+	// db, err := sql.Open("mysql", dbConn)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// defer db.Close()
+	// // articleID := 1
+	// tx, err := db.Begin()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 
-	article_id := 1
-	const sqlGetNice = `
-	select nice from articles where article_id=?;`
-	row := tx.QueryRow(sqlGetNice, article_id)
+	// article_id := 1
+	// const sqlGetNice = `
+	// select nice from articles where article_id=?;`
+	// row := tx.QueryRow(sqlGetNice, article_id)
 
-	if err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	tx.Rollback()
+	// 	return
+	// }
 
-	var niceNum int
-	err = row.Scan(&niceNum)
-	if err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
+	// var niceNum int
+	// err = row.Scan(&niceNum)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	tx.Rollback()
+	// 	return
+	// }
 
-	const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
-	_, err = tx.Exec(sqlUpdateNice, niceNum+1, article_id)
-	if err != nil {
-		fmt.Println(err)
-		tx.Rollback()
-		return
-	}
-	tx.Commit()
+	// const sqlUpdateNice = `update articles set nice = ? where article_id = ?`
+	// _, err = tx.Exec(sqlUpdateNice, niceNum+1, article_id)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	tx.Rollback()
+	// 	return
+	// }
+	// tx.Commit()
 
 	// const sqlStr = `
 	// 	select * from articles

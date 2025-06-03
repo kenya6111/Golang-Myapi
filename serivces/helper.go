@@ -16,8 +16,10 @@ var (
 )
 
 func connectDB() (*sql.DB, error) {
+	fmt.Println(33)
 	db, err := sql.Open("mysql", dbConn)
 	if err != nil {
+		fmt.Println("aaa")
 		return nil, err
 	}
 	return db, nil
